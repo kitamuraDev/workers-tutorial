@@ -13,12 +13,18 @@
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response(
-			JSON.stringify({
-				country: request.cf?.country,
-				asOrganization: request.cf?.asOrganization,
-			}),
-			{ headers: { 'content-type': 'application/json' } }
-		);
+		const lastAccess = await env.my_first_kv.get('last_access');
+		if (lastAccess) {
+			return new Response(lastAccess);
+		} else {
+			await env.my_first_kv.put('last_access', formatDate(new Date()), {
+				expirationTtl: 60 // 1m
+			});
+			return new Response('new_access');
+		}
 	},
 } satisfies ExportedHandler<Env>;
+
+// format to `YYYY-MM-DD HH:MM:SS`
+const formatDate = (d: Date) =>
+	`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
