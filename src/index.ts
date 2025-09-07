@@ -16,7 +16,6 @@ export default {
 		return new Response(
 			JSON.stringify({
 				country: request.cf?.country,
-				asn: request.cf?.asn,
 				asOrganization: request.cf?.asOrganization,
 			}),
 			{ headers: { 'content-type': 'application/json' } }
