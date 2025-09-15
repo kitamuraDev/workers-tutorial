@@ -1,4 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
+import { renderCounterHtml } from "./renderCounterHtml";
 
 export class MyDurableObject extends DurableObject {
 	async count(): Promise<number> {
@@ -13,6 +14,14 @@ export class MyDurableObject extends DurableObject {
 		return addedCount;
 	}
 
+	async decrement(): Promise<number> {
+		const count = await this.count();
+		const subtractedCount = count - 1;
+		await this.ctx.storage.put('count', subtractedCount);
+
+		return subtractedCount;
+	}
+
 	async delete(): Promise<void> {
 		await this.ctx.storage.delete('count');
 	}
@@ -20,8 +29,7 @@ export class MyDurableObject extends DurableObject {
 
 /**
  * TODO
- * 	- decrementを追加する
- * 	- resetを追加する
+ *  - roomIdは大文字小文字を区別しないようにする
  * 	- Counter with WebSocketを実装する
  */
 export default {
@@ -61,6 +69,11 @@ export default {
 				return new Response(count.toString());
 			}
 
+			if (url.pathname === '/decrement') {
+				const count = await stub.decrement();
+				return new Response(count.toString());
+			}
+
 			if (url.pathname === '/reset') {
 				await stub.delete();
 				const count = await stub.count();
@@ -72,25 +85,3 @@ export default {
 	},
 } satisfies ExportedHandler<Env>;
 
-function renderCounterHtml(roomId: string, count: number): string {
-  return `
-    <!DOCTYPE html>
-    <html lang="ja">
-      <head>
-        <meta charset="UTF-8">
-        <title>Room Counter</title>
-      </head>
-      <body>
-        <h1>RoomId ${roomId}: <span id="counter">${count}</span></h1>
-        <button id="increment-btn">カウントアップ</button>
-        <script>
-          document.getElementById('increment-btn').onclick = async () => {
-            const res = await fetch('/increment?roomId=${roomId}', { method: 'PUT' });
-            const count = await res.text();
-            document.getElementById('counter').textContent = count;
-          };
-        </script>
-      </body>
-    </html>
-  `;
-}
