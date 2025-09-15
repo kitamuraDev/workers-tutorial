@@ -11,20 +11,40 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { DurableObject } from "cloudflare:workers";
+
+export class MyDurableObject extends DurableObject {
+	async increment(): Promise<number> {
+		const count = await this.ctx.storage.get<number>('count') || 0;
+		const addedCount = count + 1;
+		await this.ctx.storage.put('count', addedCount);
+
+		return addedCount;
+	}
+
+	async deleteCount(): Promise<void> {
+		await this.ctx.storage.delete('count');
+	}
+}
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		const lastAccess = await env.my_first_kv.get('last_access');
-		if (lastAccess) {
-			return new Response(lastAccess);
-		} else {
-			await env.my_first_kv.put('last_access', formatDate(new Date()), {
-				expirationTtl: 60 // 1m
-			});
-			return new Response('new_access');
+		const url = new URL(request.url);
+		const roomId = url.searchParams.get('roomId') || '0'; // デフォルトは'0'
+
+		const id = env.MY_DURABLE_OBJECT.idFromName(roomId)
+		const stub = env.MY_DURABLE_OBJECT.get(id)
+
+		if (request.method === 'GET') {
+			const count = await stub.increment()
+			return new Response(`RoomId ${roomId}: ${count}`);
 		}
+
+		if (request.method === 'DELETE') {
+			await stub.deleteCount();
+			return new Response(`RoomId ${roomId}: deleted`);
+		}
+
+		return new Response('Method not allowed', { status: 405 });
 	},
 } satisfies ExportedHandler<Env>;
-
-// format to `YYYY-MM-DD HH:MM:SS`
-const formatDate = (d: Date) =>
-	`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;

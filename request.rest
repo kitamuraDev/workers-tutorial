@@ -1,7 +1,15 @@
 ### local
 
-GET http://localhost:8787/ HTTP/1.1
+GET http://localhost:8787/?roomId=1 HTTP/1.1
+
+###
+
+DELETE http://localhost:8787/?roomId=1 HTTP/1.1
 
 ### remote
 
-GET https://workers-tutorial.kitamuradev.workers.dev/ HTTP/1.1
+GET https://workers-tutorial.kitamuradev.workers.dev/?roomId=1 HTTP/1.1
+
+###
+
+DELETE https://workers-tutorial.kitamuradev.workers.dev/?roomId=1 HTTP/1.1

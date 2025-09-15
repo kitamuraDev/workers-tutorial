@@ -15,6 +15,20 @@
 			"binding": "my_first_kv",
 			"id": "382c7241342d484a9d1d0dd1339b93d7"
 		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "MyDurableObject",
+				"name": "MY_DURABLE_OBJECT"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["MyDurableObject"]
+		}
 	]
 	/**
 	 * Smart Placement
