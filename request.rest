@@ -10,6 +10,10 @@ PUT http://localhost:8787/increment?roomId=1 HTTP/1.1
 
 ###
 
+PUT http://localhost:8787/decrement?roomId=1 HTTP/1.1
+
+###
+
 PUT http://localhost:8787/reset?roomId=1 HTTP/1.1
 
 ### ==============================
@@ -21,6 +25,10 @@ GET https://workers-tutorial.kitamuradev.workers.dev/count?roomId=1 HTTP/1.1
 ###
 
 PUT https://workers-tutorial.kitamuradev.workers.dev/increment?roomId=1 HTTP/1.1
+
+###
+
+PUT http://workers-tutorial.kitamuradev.workers.dev/decrement?roomId=1 HTTP/1.1
 
 ###
 
