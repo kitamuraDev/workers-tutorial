@@ -1,15 +1,27 @@
+### ==============================
 ### local
+### ==============================
 
-GET http://localhost:8787/?roomId=1 HTTP/1.1
+GET http://localhost:8787/count?roomId=1 HTTP/1.1
 
 ###
 
-DELETE http://localhost:8787/?roomId=1 HTTP/1.1
+PUT http://localhost:8787/increment?roomId=1 HTTP/1.1
 
+###
+
+PUT http://localhost:8787/reset?roomId=1 HTTP/1.1
+
+### ==============================
 ### remote
+### ==============================
 
-GET https://workers-tutorial.kitamuradev.workers.dev/?roomId=1 HTTP/1.1
+GET https://workers-tutorial.kitamuradev.workers.dev/count?roomId=1 HTTP/1.1
 
 ###
 
-DELETE https://workers-tutorial.kitamuradev.workers.dev/?roomId=1 HTTP/1.1
+PUT https://workers-tutorial.kitamuradev.workers.dev/increment?roomId=1 HTTP/1.1
+
+###
+
+PUT https://workers-tutorial.kitamuradev.workers.dev/reset?roomId=1 HTTP/1.1
