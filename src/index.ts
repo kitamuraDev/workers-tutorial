@@ -29,13 +29,12 @@ export class MyDurableObject extends DurableObject {
 
 /**
  * TODO
- *  - roomIdは大文字小文字を区別しないようにする
  * 	- Counter with WebSocketを実装する
  */
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
-		const roomId = url.searchParams.get('roomId') || '0'; // デフォルトは'0'
+		const roomId = getAllowedRoomId(url);
 
 		const id = env.MY_DURABLE_OBJECT.idFromName(roomId)
 		const stub = env.MY_DURABLE_OBJECT.get(id)
@@ -85,3 +84,14 @@ export default {
 	},
 } satisfies ExportedHandler<Env>;
 
+
+// 許可するクエリパラメータ名からroomIdを取得する
+function getAllowedRoomId(url: URL): string {
+    const allowedRoomIdParams = ['roomid', 'roomId', 'room_id'];
+
+    return (
+      allowedRoomIdParams
+        .map(name => url.searchParams.get(name))
+        .find(val => typeof val === 'string' && val.trim().length > 0) || '0'
+    );
+}
